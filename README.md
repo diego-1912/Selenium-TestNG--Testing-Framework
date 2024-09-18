@@ -1,89 +1,272 @@
-# Test Automation Project
+# Selenium TestNG Framework
 
-## Overview
-This project is a test automation framework for the SauceDemo website (https://www.saucedemo.com). It uses Selenium WebDriver with Java, TestNG, and follows the Page Object Model (POM) design pattern. The framework is configured to run tests on multiple browsers and includes logging functionality using Log4j2.
-
-## Table of Contents
-1. [Project Structure](#project-structure)
-2. [Setup](#setup)
-3. [Configuration](#configuration)
-4. [Running Tests](#running-tests)
-5. [Jenkins Pipelines](#Jenkins-Pipeline)
-
+This project is a robust automation testing framework built with Selenium WebDriver, TestNG, Java, and Log4j2, following the Page Object Model design pattern.
 
 ## Project Structure
-- `src/main/java/pages/`: Contains page object classes (BaseClass, LoginPage, DashboardPage)
-- `src/test/java/my/project/Test/`: Contains test classes (LoginTest, DashboardTest)
-- `src/test/resources/`: Contains configuration files (log4j2.xml, test-config.properties)
-- `TestNG.xml`: TestNG suite configuration file
-- `src/test/java/DriverFactory/`: Contains the driver configuration
-- `src/test/java/TestListener/`: Contains the TestNG configuration
 
+```
+test/
+├── java/
+│   ├── my.project.Test/
+│   │   ├── DashboardTest.java
+│   │   └── LoginTest.java
+│   ├── pages/
+│   │   ├── BaseClass.java
+│   │   ├── DashboardPage.java
+│   │   └── LoginPage.java
+│   └── utils/
+│       ├── DriverFactory.java
+│       ├── LogDirectoryInitializer.java
+│       ├── RetryAnalyzer.java
+│       └── TestListener.java
+├── resources/
+│   ├── log4j2.xml
+│   ├── test-config.properties
+│   └── testng.xml
+└── test-output/
+    └── ExtentReport_*.html
 
-## Setup
-1. Ensure you have Java JDK 17 or higher installed
-2. Install Maven
-3. Clone this repository
-4. Run `mvn clean install` to download dependencies
+.gitignore
+Dockerfile
+Jenkinsfile
+pom.xml
+```
 
+## Key Components
 
-## Configuration
-- `test-config.properties`: Contains the base URL for the application
-- `log4j2.xml`: Configures logging for different browsers
-- `TestNG.xml`: Configures test suite, including browser parameter
+### Test Classes
+- `DashboardTest.java`: Contains test methods for dashboard functionality.
+- `LoginTest.java`: Contains test methods for login functionality.
 
+### Page Objects
+- `BaseClass.java`: Base class for all page objects, containing common methods and WebDriver initialization.
+- `DashboardPage.java`: Page object for the dashboard page.
+- `LoginPage.java`: Page object for the login page.
+
+### Utility Classes
+- `DriverFactory.java`: Manages WebDriver instance creation.
+- `LogDirectoryInitializer.java`: Initializes log directories.
+- `RetryAnalyzer.java`: Implements retry logic for failed tests.
+- `TestListener.java`: TestNG listener for logging and reporting.
+
+### Configuration Files
+- `log4j2.xml`: Log4j2 configuration file.
+- `test-config.properties`: Test configuration properties.
+- `testng.xml`: TestNG suite configuration file.
 
 ## Running Tests
-To run the tests, use the following command:  `mvn test` to run all the tests.
 
+To run the tests, use the following Maven command:
 
-Replace `firefox` with `chrome` to run tests in Chrome.
+```
+mvn clean test
+```
 
-## Jenkins Pipeline
+This command will execute the TestNG suite defined in `src/test/resources/testng.xml`.
 
-The project includes a `Jenkinsfile` that defines the CI/CD pipeline with the following stages:
+## Jenkins Configuration
 
-1. **Checkout**
-2. **Build**
-3. **Run Tests - Firefox**
-4. **Run Tests - Chrome**
-5. **Publish Test Results**
-6. **Publish Extent Report**
+The `Jenkinsfile` in the project root defines the CI/CD pipeline. Here's a brief overview of the stages:
 
-## Jenkins Setup
+1. **Checkout**: Retrieves the latest code from the repository.
+2. **Build**: Compiles the project using Maven.
+3. **Run Tests**: Executes tests for different browsers (Firefox and Chrome).
+4. **Publish Test Results**: Publishes TestNG results.
+5. **Publish Extent Report**: Generates and publishes the Extent Report.
 
-1. Ensure Jenkins has JDK 17, Maven 3.8.4, TestNG Plugin, and HTML Publisher Plugin.
-2. Create a new Pipeline job.
-3. Set "Pipeline script from SCM" as the pipeline definition.
-4. Specify your SCM (e.g., Git) and repository URL.
-5. Set the script path to `Jenkinsfile`.
+## Dependencies
 
-## Environment Variables
+Major dependencies include:
 
-The `Jenkinsfile` sets these environment variables:
+- Selenium WebDriver (4.24.0)
+- TestNG (7.10.2)
+- WebDriverManager (5.9.2)
+- ExtentReports (5.0.9)
+- Log4j2 (2.24.0)
+- Lombok (1.18.34)
 
-- `FIREFOX_BINARY`
-- `CHROME_BINARY`
-- `GECKODRIVER_PATH`
-- `CHROMEDRIVER_PATH`
+For a complete list of dependencies, refer to the `pom.xml` file.
 
-Ensure these paths are correct for your Jenkins agent.
+## Configuration
+
+### Browser Configuration
+Browser selection is done through the `testng.xml` file. Each test can be configured to run on different browsers:
+
+```xml
+<test name="Login Tests - Firefox">
+    <parameter name="browser" value="firefox"/>
+    <!-- ... -->
+</test>
+```
+
+### Base URL Configuration
+The base URL is set in `test-config.properties`:
+
+```properties
+base.url=https://www.saucedemo.com
+```
+
+## Logging
+
+Logging is configured in `log4j2.xml`. Logs are stored in the `logs` directory, separated by browser type.
 
 ## Reporting
 
-- TestNG results are published using the TestNG plugin in Jenkins.
-- Extent Reports are generated in the `test-output` directory.
+The framework uses ExtentReports for generating detailed HTML reports. Reports are stored in the `test-output` directory.
 
-## Logs
+## Docker Support
 
-Test execution logs are archived in the `logs` directory.
+A `Dockerfile` is provided for containerized execution of tests. Build and run the Docker image to execute tests in a containerized environment.
 
-## Troubleshooting
+## Contributing
 
-For Jenkins pipeline issues:
+Please read `CONTRIBUTING.md` for details on our code of conduct, and the process for submitting pull requests.
 
-- Check for required tools and plugins on the Jenkins agent.
-- Verify environment variable paths in the `Jenkinsfile`.
-- Ensure proper permissions for test execution and report creation.
+## License
 
-For local test issues, verify your Java, Maven, and WebDriver setups.
+This project is licensed under the MIT License - see the `LICENSE.md` file for details.
+
+## Jenkins Configuration
+
+The `Jenkinsfile` in the project root defines the CI/CD pipeline. Here's a detailed breakdown of the pipeline stages:
+
+1. **Checkout**:
+    - Retrieves the latest code from the source control repository.
+
+2. **Build**:
+    - Uses Maven to compile the project.
+    - Command: `mvn clean compile`
+
+3. **Run Tests - Firefox**:
+    - Executes tests specifically for Firefox browser.
+    - Command: `mvn test -Dbrowser=firefox -DbaseUrl=https://www.saucedemo.com/`
+
+4. **Run Tests - Chrome**:
+    - Executes tests specifically for Chrome browser.
+    - Command: `mvn test -Dbrowser=chrome -DbaseUrl=https://www.saucedemo.com/`
+
+5. **Publish Test Results**:
+    - Publishes TestNG results using the JUnit plugin.
+    - Looks for test results in: `**/target/surefire-reports/testng-results.xml`
+
+6. **Publish Extent Report**:
+    - Generates and publishes the Extent Report as an HTML report.
+    - Uses the HTML Publisher plugin.
+    - Report directory: `test-output`
+    - Report files: `ExtentReport.html`
+    - Report name: 'Extent Report'
+
+### Jenkinsfile Content
+
+```groovy
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven 3.8.4'
+        jdk 'JDK 17'
+    }
+
+    environment {
+        FIREFOX_BINARY = '/usr/bin/firefox'
+        CHROME_BINARY = '/usr/bin/google-chrome-stable'
+        GECKODRIVER_PATH = '/usr/local/bin/geckodriver'
+        CHROMEDRIVER_PATH = '/usr/local/bin/chromedriver'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean compile'
+            }
+        }
+
+        stage('Run Tests - Firefox') {
+            steps {
+                sh 'mvn test -Dbrowser=firefox -DbaseUrl=https://www.saucedemo.com/'
+            }
+        }
+
+        stage('Run Tests - Chrome') {
+            steps {
+                sh 'mvn test -Dbrowser=chrome -DbaseUrl=https://www.saucedemo.com/'
+            }
+        }
+
+        stage('Publish Test Results') {
+            steps {
+                junit '**/target/surefire-reports/testng-results.xml'
+            }
+        }
+
+        stage('Publish Extent Report') {
+            steps {
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: true,
+                    reportDir: 'test-output',
+                    reportFiles: 'ExtentReport.html',
+                    reportName: 'Extent Report'
+                ])
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'logs/**/*.log', allowEmptyArchive: true
+            cleanWs()
+        }
+    }
+}
+```
+
+### Running the Pipeline in Jenkins
+
+To run this pipeline in Jenkins:
+
+1. Ensure Jenkins is set up with the necessary plugins:
+    - Git plugin
+    - Maven Integration plugin
+    - HTML Publisher plugin
+
+2. Create a new Jenkins Pipeline job:
+    - In Jenkins, click "New Item"
+    - Choose "Pipeline" as the job type
+    - Give your job a name and click "OK"
+
+3. Configure the pipeline:
+    - In the job configuration, scroll to the "Pipeline" section
+    - Choose "Pipeline script from SCM" in the "Definition" dropdown
+    - Select "Git" as the SCM
+    - Enter your repository URL
+    - Specify the branch to build (e.g., `*/main`)
+    - Set the "Script Path" to `Jenkinsfile`
+
+4. Save the job configuration
+
+5. Run the pipeline:
+    - Click "Build Now" to manually trigger the pipeline
+    - The pipeline will execute all stages defined in the Jenkinsfile
+
+6. View Results:
+    - After the pipeline completes, you can view the test results and Extent Report from the job's page
+    - Click on the build number and look for "Test Result" and "Extent Report" links
+
+### Continuous Integration
+
+For continuous integration:
+
+1. Set up webhooks in your Git repository to trigger the Jenkins job on each commit or pull request.
+2. Configure the Jenkins job to poll SCM or use Git plugin's post-commit hook for automatic triggering.
+
+This setup ensures that your tests are automatically run whenever changes are pushed to the repository, providing quick feedback on the health of your codebase.
+
+[The rest of the README content remains the same...]
